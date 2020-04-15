@@ -9,6 +9,7 @@ module Spree
 
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           puts 'I AM CALCULATING EASYPOST RATES'
+          binding.pry
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
 
