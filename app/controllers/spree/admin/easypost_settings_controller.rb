@@ -9,7 +9,7 @@ module Spree
       def update
         update_easypost_settings
 
-        redirect_to :back
+        redirect_back fallback_location: '/admin'
       end
 
       private
