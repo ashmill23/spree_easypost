@@ -14,7 +14,7 @@ $(document).ready(function () {
       }
     }).done(function () {
       window.location.reload();
-    }).error(function (msg) {
+    }).fail(function (msg) {
       console.log(msg);
     });
   });
