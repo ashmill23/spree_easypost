@@ -41,7 +41,7 @@
         <tr id="<%= spree_dom_id scan_form %>" data-hook="scan_form_row">
           <td><%= scan_form.created_at.to_date %></td>
           <td><%= scan_form.number %></td>
-          <td><%= scan_form.stock_location.admin_name %></td>
+          <td><%= scan_form.stock_location.try(:admin_name) %></td>
           <td class="actions actions-1 text-right">
             <%= link_to_with_icon 'file', Spree.t('scan_form'), scan_form.scan_form, class: 'scanform-item btn btn-primary btn-sm', title: Spree.t('scan_form'), no_text: true %>
           </td>
