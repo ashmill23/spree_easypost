@@ -10,11 +10,14 @@ Spree::ShippingMethod.class_eval do
     self.display_on == "none"
   end
 
+  def both?
+    self.display_on == 'both'
+  end
+
   # Only should shipping methods that need to be displayed
   def available_to_display(display_filter)
-    binding.pry
     (frontend? && display_filter == Spree::ShippingMethod::DISPLAY_ON_FRONT_END) ||
-    (!frontend? && display_filter == Spree::ShippingMethod::DISPLAY_ON_BACK_END)
+    ((!frontend? || both?) && display_filter == Spree::ShippingMethod::DISPLAY_ON_BACK_END)
   end
 
 end
