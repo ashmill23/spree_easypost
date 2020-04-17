@@ -61,6 +61,7 @@ module Spree
       # Shipping method based on the admin(internal)_name. This is not user facing
       # and should not be changed in the admin.
       def find_or_create_shipping_method(rate)
+        binding.pry
         method_name = "#{ rate.carrier } #{ rate.service }"
         Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
           r.name = method_name
