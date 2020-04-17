@@ -11,11 +11,11 @@ module Spree
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
 
           shipping_rates = []
-          binding.pry
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
-              shipping_method = find_or_create_shipping_method(rate)
+              shipping_method = find_or_create_shipping_method(rate, package.stock_location.try(:vendor_id))
+              next unless shipping_method.present?
               # Get the calculator to see if we want to use easypost rate
               calculator = shipping_method.calculator
               # Create the easypost rate
@@ -60,15 +60,17 @@ module Spree
       # Cartons require shipping methods to be present, This will lookup a
       # Shipping method based on the admin(internal)_name. This is not user facing
       # and should not be changed in the admin.
-      def find_or_create_shipping_method(rate)
-        binding.pry
-        method_name = "#{ rate.carrier } #{ rate.service }"
-        Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
-          r.name = method_name
-          r.display_on = 'back_end'
-          r.code = rate.service
-          r.calculator = Spree::Calculator::Shipping::FlatRate.create
-          r.shipping_categories = [Spree::ShippingCategory.first]
+      def find_or_create_shipping_method(rate, vendor_id)
+        if vendor_id.present?
+          Spree::ShippingMethod.find_by(admin_name: method_name, vendor_id: vendor_id)
+        else
+          Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
+            r.name = method_name
+            r.display_on = 'back_end'
+            r.code = rate.service
+            r.calculator = Spree::Calculator::Shipping::FlatRate.create
+            r.shipping_categories = [Spree::ShippingCategory.first]
+          end
         end
       end
     end
