@@ -29,11 +29,12 @@ Spree::Shipment.class_eval do
         rate.id == selected_easy_post_rate_id
       end
 
-      binding.pry
       # Purchase the postage unless it was purchased before
-      easypost_shipment.buy(rate) unless self.tracking?
-      self.tracking = easypost_shipment.tracking_code
-      self.tracking_label = easypost_shipment.postage_label.label_url
+      unless self.tracking?
+        easypost_shipment.buy(rate)
+        self.tracking = easypost_shipment.tracking_code
+        self.tracking_label = easypost_shipment.postage_label.label_url
+      end
     end
 
     private
