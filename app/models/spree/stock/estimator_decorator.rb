@@ -11,7 +11,7 @@ module Spree
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
 
           shipping_rates = []
-
+          binding.pry
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
