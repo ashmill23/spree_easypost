@@ -9,7 +9,7 @@ module Spree
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
-
+          binding.pry
           shipping_rates = []
           if rates.any?
             rates.each do |rate|
@@ -62,7 +62,7 @@ module Spree
       # and should not be changed in the admin.
       def find_or_create_shipping_method(rate, vendor_id)
         method_name = "#{ rate.carrier } #{ rate.service }"
-        
+        binding.pry
         if vendor_id.present?
           Spree::ShippingMethod.find_by(admin_name: method_name, vendor_id: vendor_id)
         else
