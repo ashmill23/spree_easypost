@@ -5,11 +5,11 @@ module Spree
         # Only use easypost on the FrontEnd if the flag is set and the package
         # flag allows for it to be used. Otherwise use the default spree methods.
         # This allows for faster load times on the front end if we dont want to do dyanmic shipping
-
+        puts "use easypost?  #{use_easypost_to_calculate_rate?(package, shipping_method_filter)}"
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
-
+          puts "rates: #{rates}"
           shipping_rates = []
           if rates.any?
             rates.each do |rate|
@@ -62,7 +62,7 @@ module Spree
       # and should not be changed in the admin.
       def find_or_create_shipping_method(rate, vendor_id)
         method_name = "#{ rate.carrier } #{ rate.service }"
-        
+        puts "here i am: #{vendor_id} #{method_name}"
         if vendor_id.present?
           Spree::ShippingMethod.find_by(admin_name: method_name, vendor_id: vendor_id)
         else
