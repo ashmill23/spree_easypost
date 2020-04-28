@@ -64,7 +64,8 @@ module Spree
         method_name = "#{ rate.carrier } #{ rate.service }"
         puts "here i am: #{vendor_id} #{method_name}"
         if vendor_id.present?
-          Spree::ShippingMethod.find_by(admin_name: method_name, vendor_id: vendor_id)
+          vendor = Spree::Vendor.find_by(id: vendor_id)
+          vendor.present? ? vendor.shipping_methods.find_by(admin_name: method_name) : nil
         else
           Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
             r.name = method_name
