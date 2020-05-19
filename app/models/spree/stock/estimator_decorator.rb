@@ -15,7 +15,6 @@ module Spree
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
               shipping_method = find_or_create_shipping_method(rate, package.stock_location.try(:vendor_id))
-              binding.pry
               next unless shipping_method.present?
               # Get the calculator to see if we want to use easypost rate
               calculator = shipping_method.calculator
@@ -26,7 +25,7 @@ module Spree
                 easy_post_rate_id: rate.id,
                 shipping_method: shipping_method
               )
-              binding.pry
+
               # Save the rates that we want to show the customer
               shipping_rates << spree_rate if shipping_method.available_to_display(shipping_method_filter)
             end
