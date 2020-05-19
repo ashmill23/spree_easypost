@@ -63,10 +63,11 @@ module Spree
       def find_or_create_shipping_method(rate, vendor_id)
         method_name = "#{ rate.carrier } #{ rate.service }"
         puts "here i am: #{vendor_id} #{method_name}"
-        if vendor_id.present?
-          vendor = Spree::Vendor.find_by(id: vendor_id)
-          vendor.present? ? vendor.shipping_methods.find_by(admin_name: method_name) : nil
-        else
+        # TODO figure out if easypost shipping rates shoudl be generic (yes?) or per vendor
+        #if vendor_id.present?
+        #  vendor = Spree::Vendor.find_by(id: vendor_id)
+        #  vendor.present? ? vendor.shipping_methods.find_by(admin_name: method_name) : nil
+        #else
           Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
             r.name = method_name
             r.display_on = 'back_end'
@@ -74,7 +75,7 @@ module Spree
             r.calculator = Spree::Calculator::Shipping::FlatRate.create
             r.shipping_categories = [Spree::ShippingCategory.first]
           end
-        end
+        #end
       end
     end
   end
