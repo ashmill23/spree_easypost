@@ -15,6 +15,7 @@ module Spree
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
               shipping_method = find_or_create_shipping_method(rate, package.stock_location.try(:vendor_id))
+              binding.pry
               next unless shipping_method.present?
               # Get the calculator to see if we want to use easypost rate
               calculator = shipping_method.calculator
