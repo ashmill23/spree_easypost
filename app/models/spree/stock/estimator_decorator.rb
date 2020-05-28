@@ -64,7 +64,7 @@ module Spree
       def find_or_create_shipping_method(rate, vendor_id)
         method_name = "#{ rate.carrier } #{ rate.service }"
         puts "here i am: #{vendor_id} #{method_name}"
-         TODO figure out if easypost shipping rates shoudl be generic (yes?) or per vendor
+        #TODO figure out if easypost shipping rates shoudl be generic (yes?) or per vendor
         if vendor_id.present?
           vendor = Spree::Vendor.find_by(id: vendor_id)
           vendor.present? ? vendor.shipping_methods.find_by(admin_name: method_name) : nil
