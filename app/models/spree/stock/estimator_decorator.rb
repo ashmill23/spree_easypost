@@ -67,6 +67,7 @@ module Spree
         #TODO figure out if easypost shipping rates shoudl be generic (yes?) or per vendor
         if vendor_id.present?
           vendor = Spree::Vendor.find_by(id: vendor_id)
+          binding.pry
           vendor.present? ? vendor.shipping_methods.find_by(admin_name: method_name) : nil
         else
           Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
