@@ -116,4 +116,4 @@ module Spree
 end
 
 Spree::Address.prepend Spree::EasyPost::AddressDecorator
-Spree::StockLocation.prepend Spree::EasyPost::
+Spree::StockLocation.prepend Spree::EasyPost::AddressDecorator
