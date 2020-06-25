@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'spree_core', '>= 3.1.0'
   s.add_dependency 'spree_extension'
-  s.add_dependency 'easypost', '>= 3.1'
+  s.add_dependency 'easypost', '>= 3.1.2'
 
   s.add_development_dependency 'capybara'
   s.add_development_dependency 'capybara-screenshot'
