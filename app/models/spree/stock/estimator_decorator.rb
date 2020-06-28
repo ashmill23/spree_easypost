@@ -39,6 +39,7 @@ module Spree
             []
           end
         else
+          binding.pry
           rates = calculate_shipping_rates(package, shipping_method_filter)
           choose_default_shipping_rate(rates)
           sort_shipping_rates(rates)
