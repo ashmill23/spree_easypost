@@ -9,8 +9,9 @@ module Spree
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
-          puts "rates: #{rates}"
-          shipping_rates = []
+
+          shipping_rates = calculate_shipping_rates(package, shipping_method_filter)
+          
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
@@ -29,18 +30,16 @@ module Spree
               # Save the rates that we want to show the customer
               shipping_rates << spree_rate if shipping_method.available_to_display(shipping_method_filter)
             end
-            binding.pry
 
             # Sets cheapest rate to be selected by default
             if shipping_rates.any?
               shipping_rates.min_by(&:cost).selected = true
             end
-            shipping_rates
+            shipping_rates.uniq
           else
             []
           end
         else
-          binding.pry
           rates = calculate_shipping_rates(package, shipping_method_filter)
           choose_default_shipping_rate(rates)
           sort_shipping_rates(rates)
