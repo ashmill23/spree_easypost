@@ -100,8 +100,9 @@ module Spree
       def calculate_price_sacks(vendor_id, package, display_filter)
         price_sacks(vendor_id, package, display_filter).map do |shipping_method|
           cost = shipping_method.calculator.compute(package)
-          binding.pry
-          next unless cost
+
+          #don't display price sacks with easypost unless they are free
+          next if (cost.blank? || cost > 0)
 
           shipping_method.shipping_rates.new(
             cost: gross_amount(cost, taxation_options_for(shipping_method)),
