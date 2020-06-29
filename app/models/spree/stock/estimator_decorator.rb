@@ -9,14 +9,16 @@ module Spree
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
-          #binding.pry
-          #shipping_rates = calculate_shipping_rates(package, shipping_method_filter)
-          shipping_rates = []
-          binding.pry
+
+          vendor_id = package.stock_location.try(:vendor_id)
+
+          #add price sacks to easypost rates
+          shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
+          
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
-              shipping_method = find_or_create_shipping_method(rate, package.stock_location.try(:vendor_id))
+              shipping_method = find_or_create_shipping_method(rate, vendor_id)
               next unless shipping_method.present?
               # Get the calculator to see if we want to use easypost rate
               calculator = shipping_method.calculator
@@ -79,6 +81,33 @@ module Spree
             r.shipping_categories = [Spree::ShippingCategory.first]
           end
         end
+      end
+
+      def price_sacks(vendor_id, package, display_filter)
+        vendor = Spree::Vendor.find_by(id: vendor_id)
+
+        vendor.shipping_methods.price_sacks.select do |ship_method|
+          calculator = ship_method.calculator
+
+          ship_method.available_to_display?(display_filter) &&
+            ship_method.include?(order.ship_address) &&
+            calculator.available?(package) &&
+            (calculator.preferences[:currency].blank? ||
+             calculator.preferences[:currency] == currency)
+        end
+      end
+
+      def calculate_price_sacks(vendor_id, package, display_filter)
+        price_sacks(vendor_id, package, display_filter).map do |shipping_method|
+          cost = shipping_method.calculator.compute(package)
+
+          next unless cost
+
+          shipping_method.shipping_rates.new(
+            cost: gross_amount(cost, taxation_options_for(shipping_method)),
+            tax_rate: first_tax_rate_for(shipping_method.tax_category)
+          )
+        end.compact
       end
     end
   end
