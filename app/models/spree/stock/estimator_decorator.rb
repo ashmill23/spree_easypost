@@ -38,7 +38,7 @@ module Spree
             if shipping_rates.any?
               shipping_rates.min_by(&:cost).selected = true
             end
-            shipping_rates.uniq
+            shipping_rates
           else
             []
           end
