@@ -100,7 +100,7 @@ module Spree
       def calculate_price_sacks(vendor_id, package, display_filter)
         price_sacks(vendor_id, package, display_filter).map do |shipping_method|
           cost = shipping_method.calculator.compute(package)
-
+          binding.pry
           next unless cost
 
           shipping_method.shipping_rates.new(
