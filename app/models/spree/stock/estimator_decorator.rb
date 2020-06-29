@@ -12,7 +12,6 @@ module Spree
           #binding.pry
           #shipping_rates = calculate_shipping_rates(package, shipping_method_filter)
           shipping_rates = []
-          binding.pry
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
