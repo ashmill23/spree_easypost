@@ -12,8 +12,12 @@ module Spree
 
           vendor_id = package.stock_location.try(:vendor_id)
 
-          #add price sacks to easypost rates
-          shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
+          if vendor_id.present?
+            #add price sacks to easypost rates
+            shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
+          else
+            shipping_rates = []
+          end
           
           if rates.any?
             rates.each do |rate|
