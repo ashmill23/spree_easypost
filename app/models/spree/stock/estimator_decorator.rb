@@ -6,6 +6,7 @@ module Spree
         # flag allows for it to be used. Otherwise use the default spree methods.
         # This allows for faster load times on the front end if we dont want to do dyanmic shipping
         puts "use easypost?  #{use_easypost_to_calculate_rate?(package, shipping_method_filter)}"
+        binding.pry
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
