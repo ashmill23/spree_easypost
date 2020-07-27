@@ -19,7 +19,6 @@ module Spree
             #add price sacks to easypost rates
             shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
             shipping_rates << shopify_rates(package, vendor_id)
-            binding.pry
           else
             shipping_rates = []
           end
@@ -49,7 +48,7 @@ module Spree
             end
             shipping_rates
           else
-            []
+            shipping_rates
           end
         else
           rates = calculate_shipping_rates(package, shipping_method_filter)
