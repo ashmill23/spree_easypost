@@ -131,7 +131,8 @@ module Spree
         )
 
         ShopifyAPI::Base.activate_session(session)
-  
+        shipping_address = package.order.shipping_address
+        
         shopify_checkout = ShopifyAPI::Checkout.create(
           email: package.order.user.try(:email),
           line_items: shopify_line_items(package),
