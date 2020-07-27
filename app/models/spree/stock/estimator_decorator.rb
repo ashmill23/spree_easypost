@@ -48,6 +48,7 @@ module Spree
             end
             shipping_rates
           else
+            binding.pry
             shipping_rates
           end
         else
