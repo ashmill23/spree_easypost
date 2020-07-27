@@ -149,9 +149,9 @@ module Spree
           }
         )
 
+        rates = shopify_shipping_rates(shopify_checkout.shipping_rates)
         ShopifyAPI::Base.clear_session
-
-        shopify_shipping_rates(shopify_checkout.shipping_rates)
+        rates
       end
 
       def shopify_shipping_rates(rates)
