@@ -18,8 +18,7 @@ module Spree
           if vendor_id.present?
             #add price sacks to easypost rates
             shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
-            binding.pry
-            shipping_rates << shopify_rates(package, vendor)
+            shipping_rates << shopify_rates(package, vendor_id)
           else
             shipping_rates = []
           end
@@ -120,9 +119,9 @@ module Spree
         end.compact
       end
 
-      def shopify_rates(package, vendor)
+      def shopify_rates(package, vendor_id)
         binding.pry
-        shopify_vendor = Spree::ShopifyVendor.find_by(spree_vendor_id: vendor.id)
+        shopify_vendor = Spree::ShopifyVendor.find_by(spree_vendor_id: vendor_id)
         binding.pry
         session = ShopifyAPI::Session.new(
           domain: shopify_vendor.shopify_domain, 
