@@ -19,6 +19,7 @@ module Spree
             #add price sacks to easypost rates
             shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
             shipping_rates << shopify_rates(package, vendor_id)
+            binding.pry
           else
             shipping_rates = []
           end
@@ -120,9 +121,8 @@ module Spree
       end
 
       def shopify_rates(package, vendor_id)
-        binding.pry
         shopify_vendor = Spree::ShopifyVendor.find_by(spree_vendor_id: vendor_id)
-        binding.pry
+
         session = ShopifyAPI::Session.new(
           domain: shopify_vendor.shopify_domain, 
           token: shopify_vendor.shopify_token, 
@@ -132,7 +132,7 @@ module Spree
 
         ShopifyAPI::Base.activate_session(session)
         shipping_address = package.order.shipping_address
-        
+
         shopify_checkout = ShopifyAPI::Checkout.create(
           email: package.order.user.try(:email),
           line_items: shopify_line_items(package),
@@ -148,9 +148,25 @@ module Spree
             zip: shipping_address.zipcode
           }
         )
-        binding.pry
+
         ShopifyAPI::Base.clear_session
-        []
+
+        shopify_shipping_rates(shopify_checkout.shipping_rates)
+      end
+
+      def shopify_shipping_rates(rates)
+        rates.map do |rate|
+          shipping_method = Spree::ShippingMethod.find_or_create_by(admin_name: rate.title, name: rate.title) do |r|
+            r.display_on = 'both'
+            r.calculator = Spree::Calculator::Shipping::FlatRate.create
+            r.shipping_categories = [Spree::ShippingCategory.default]
+          end
+
+          Spree::ShippingRate.new(
+            cost: rate.price,
+            shipping_method: shipping_method
+          )
+        end
       end
 
       def shopify_line_items(package)
