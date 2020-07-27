@@ -149,15 +149,16 @@ module Spree
           }
         )
 
-        rates = shopify_shipping_rates(shopify_checkout.shipping_rates)
+        rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id)
         ShopifyAPI::Base.clear_session
         rates
       end
 
-      def shopify_shipping_rates(rates)
+      def shopify_shipping_rates(rates, vendor_id)
         rates.map do |rate|
           shipping_method = Spree::ShippingMethod.find_or_create_by(admin_name: rate.title, name: rate.title) do |r|
             r.display_on = 'both'
+            r.vendor_id = vendor_id
             r.calculator = Spree::Calculator::Shipping::FlatRate.create
             r.shipping_categories = [Spree::ShippingCategory.default]
           end
