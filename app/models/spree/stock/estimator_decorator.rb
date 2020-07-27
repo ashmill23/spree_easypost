@@ -1,3 +1,5 @@
+require 'shopify_api'
+
 module Spree
   module Stock
     module EstimatorDecorator
@@ -118,8 +120,17 @@ module Spree
       end
 
       def shopify_rates(package, vendor)
-        sync = ShopifySync::Base.new(vendor.id)
+        shopify_vendor = Spree::ShopifyVendor.find_by(spree_vendor_id: vendor.id)
+        binding.pry
+        session = ShopifyAPI::Session.new(
+          domain: shopify_vendor.shopify_domain, 
+          token: shopify_vendor.shopify_token, 
+          api_version: ENV['SHOPIFY_API_VERSION'], 
+          extra: {}
+        )
 
+        ShopifyAPI::Base.activate_session(session)
+  
         shopify_checkout = ShopifyAPI::Checkout.create(
           email: package.order.user.try(:email),
           line_items: shopify_line_items(package),
@@ -136,7 +147,7 @@ module Spree
           }
         )
         binding.pry
-        sync.clear_session
+        ShopifyAPI::Base.clear_session
         []
       end
 
