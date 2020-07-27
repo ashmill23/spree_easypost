@@ -6,7 +6,7 @@ module Spree
         # flag allows for it to be used. Otherwise use the default spree methods.
         # This allows for faster load times on the front end if we dont want to do dyanmic shipping
         puts "use easypost?  #{use_easypost_to_calculate_rate?(package, shipping_method_filter)}"
-        binding.pry
+
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
@@ -16,6 +16,7 @@ module Spree
           if vendor_id.present?
             #add price sacks to easypost rates
             shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
+            shipping_rates << shopify_rates(package, vendor)
           else
             shipping_rates = []
           end
@@ -114,6 +115,38 @@ module Spree
             tax_rate: first_tax_rate_for(shipping_method.tax_category)
           )
         end.compact
+      end
+
+      def shopify_rates(package, vendor)
+        sync = ShopifySync::Base.new(vendor.id)
+
+        shopify_checkout = ShopifyAPI::Checkout.create(
+          email: package.order.user.try(:email),
+          line_items: shopify_line_items(package),
+          shipping_address: {
+            first_name: shipping_address.firstname,
+            last_name: shipping_address.lastname,
+            address1: shipping_address.address1,
+            address2: shipping_address.address2,
+            city: shipping_address.city,
+            province_code: shipping_address.state_abbr,
+            country_code: shipping_address.country_iso3,
+            phone: shipping_address.phone,
+            zip: shipping_address.zipcode
+          }
+        )
+        binding.pry
+        sync.clear_session
+        []
+      end
+
+      def shopify_line_items(package)
+        package.contents.map do |content|
+          {
+            variant_id: content.inventory_unit.line_item.variant.shopify_id,
+            quantity: content.inventory_unit.quantity
+          }
+        end
       end
     end
   end
