@@ -149,7 +149,6 @@ module Spree
           }
         )
 
-        binding.pry
         rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id)
         ShopifyAPI::Base.clear_session
         rates
@@ -168,6 +167,8 @@ module Spree
             cost: rate.price,
             shipping_method: shipping_method
           )
+
+          binding.pry
         end
       end
 
