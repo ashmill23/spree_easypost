@@ -166,6 +166,7 @@ module Spree
           tax_rate = Spree::TaxRate.create(
             amount: rate.checkout.total_tax.to_f,
             tax_category: Spree::TaxCategory.shopify
+            calculator: Spree::Calculator.first
           )
 
           binding.pry
