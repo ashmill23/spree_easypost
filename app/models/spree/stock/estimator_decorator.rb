@@ -163,10 +163,14 @@ module Spree
             r.shipping_categories = [Spree::ShippingCategory.default]
           end
 
-          tax_rate = Spree::TaxRate.create(
+          tax_rate = Spree::TaxRate.new(
             amount: rate.checkout.total_tax.to_f,
-            tax_category: Spree::TaxCategory.shopify
+            tax_category: Spree::TaxCategory.shopify,
           )
+
+          tax_rate.calculator = Spree::Calculator::DefaultTax.new
+          binding.pry
+          tax_rate.save!
 
           Spree::ShippingRate.new(
             cost: rate.price,
