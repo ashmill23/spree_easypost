@@ -170,8 +170,8 @@ module Spree
 
           tax_rate.calculator = Spree::Calculator::DefaultTax.new
           tax_rate.save!
-
-          Spree::Adjustment.create(
+          binding.pry
+          Spree::Adjustment.create!(
             source_type: "Spree::TaxRate", 
             source_id: tax_rate.id,
             adjustable: package.line_items.first,
