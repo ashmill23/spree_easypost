@@ -149,12 +149,12 @@ module Spree
           }
         )
 
-        rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id)
+        rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id, package)
         ShopifyAPI::Base.clear_session
         rates
       end
 
-      def shopify_shipping_rates(rates, vendor_id)
+      def shopify_shipping_rates(rates, vendor_id, package)
         rates.map do |rate|
           shipping_method = Spree::ShippingMethod.find_or_create_by(admin_name: rate.title, name: rate.title) do |r|
             r.display_on = 'both'
@@ -171,7 +171,16 @@ module Spree
           tax_rate.calculator = Spree::Calculator::DefaultTax.new
           tax_rate.save!
 
-          binding.pry
+          Spree::Adjustment.create(
+            source_type: "Spree::TaxRate", 
+            source_id: tax_rate.id,
+            adjustable: package.line_items.first,
+            amount: tax_rate.amount,
+            state: :open,
+            order: package.order,
+            included: false
+          )
+
           Spree::ShippingRate.new(
             cost: rate.price,
             shipping_method: shipping_method
