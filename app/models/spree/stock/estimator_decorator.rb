@@ -148,7 +148,7 @@ module Spree
             zip: shipping_address.zipcode
           }
         )
-
+        binding.pry
         rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id, package)
         ShopifyAPI::Base.clear_session
         rates
