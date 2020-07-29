@@ -148,7 +148,31 @@ module Spree
             zip: shipping_address.zipcode
           }
         )
-        binding.pry
+
+        shopify_checkout.tax_lines.each do |tax_line|
+          tax_category = Spree::TaxCategory.find_or_create_by(name: tax_line.title)
+
+          tax_rate = Spree::TaxRate.find_or_initialize_by(
+            amount: tax_line.rate,
+            tax_category: tax_category
+          )
+
+          tax_rate.calculator = Spree::Calculator::DefaultTax.new
+          tax_rate.save!
+
+          Spree::Adjustment.create!(
+            source_type: "Spree::TaxRate", 
+            source_id: tax_rate.id,
+            adjustable: package.contents.first.line_item,
+            amount: tax_line.rate,
+            state: :open,
+            order: package.order,
+            included: false,
+            label: tax_line.title
+          )
+        end
+
+
         rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id, package)
         ShopifyAPI::Base.clear_session
         rates
@@ -162,26 +186,6 @@ module Spree
             r.calculator = Spree::Calculator::Shipping::FlatRate.create
             r.shipping_categories = [Spree::ShippingCategory.default]
           end
-
-          tax_rate = Spree::TaxRate.new(
-            amount: rate.checkout.total_tax.to_f,
-            tax_category: Spree::TaxCategory.shopify,
-          )
-
-          tax_rate.calculator = Spree::Calculator::DefaultTax.new
-          tax_rate.save!
-
-          binding.pry
-          Spree::Adjustment.create!(
-            source_type: "Spree::TaxRate", 
-            source_id: tax_rate.id,
-            adjustable: package.contents.first.line_item,
-            amount: tax_rate.amount,
-            state: :open,
-            order: package.order,
-            included: false,
-            label: 'Sales Tax'
-          )
 
           Spree::ShippingRate.new(
             cost: rate.price,
