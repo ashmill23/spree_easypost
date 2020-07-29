@@ -170,15 +170,16 @@ module Spree
 
           tax_rate.calculator = Spree::Calculator::DefaultTax.new
           tax_rate.save!
-          binding.pry
+
           Spree::Adjustment.create!(
             source_type: "Spree::TaxRate", 
             source_id: tax_rate.id,
-            adjustable: package.line_items.first,
+            adjustable: package.contents.first.line_item,
             amount: tax_rate.amount,
             state: :open,
             order: package.order,
-            included: false
+            included: false,
+            label: 'Shopify Tax'
           )
 
           Spree::ShippingRate.new(
