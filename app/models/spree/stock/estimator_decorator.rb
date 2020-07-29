@@ -171,6 +171,7 @@ module Spree
           tax_rate.calculator = Spree::Calculator::DefaultTax.new
           tax_rate.save!
 
+          binding.pry
           Spree::ShippingRate.new(
             cost: rate.price,
             shipping_method: shipping_method
