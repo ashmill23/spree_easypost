@@ -14,8 +14,10 @@ module Spree
                         end
                     end
                     respond_with(@shipment, default_template: :show)
-                rescue ::EasyPost::Error => e
-                    render json: e.json_body, :status => :bad_request
+								rescue ::EasyPost::Error => e
+										logger.info e
+										logger.info e.try(:message)
+                    render json: e.try(:json_body), :status => :bad_request
                 rescue Exception => e  
                     render json: { :error => e.message }, :status => :bad_request
                 end
