@@ -1,5 +1,3 @@
-require 'shopify_api'
-
 module Spree
   module Stock
     module EstimatorDecorator
@@ -18,8 +16,6 @@ module Spree
           if vendor_id.present?
             #add price sacks to easypost rates
             shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
-            #shipping_rates << shopify_rates(package, vendor_id)
-            #shipping_rates = shipping_rates.flatten
           else
             shipping_rates = []
           end
@@ -95,7 +91,7 @@ module Spree
       def price_sacks(vendor_id, package, display_filter)
         vendor = Spree::Vendor.find_by(id: vendor_id)
 
-        vendor.shipping_methods.price_sacks.select do |ship_method|
+        vendor.shipping_methods.non_standard.select do |ship_method|
           calculator = ship_method.calculator
 
           ship_method.available_to_display?(display_filter) &&
@@ -118,89 +114,6 @@ module Spree
             tax_rate: first_tax_rate_for(shipping_method.tax_category)
           )
         end.compact
-      end
-
-      def shopify_rates(package, vendor_id)
-        shopify_vendor = Spree::ShopifyVendor.find_by(spree_vendor_id: vendor_id)
-
-        session = ShopifyAPI::Session.new(
-          domain: shopify_vendor.shopify_domain, 
-          token: shopify_vendor.shopify_token, 
-          api_version: ENV['SHOPIFY_API_VERSION'], 
-          extra: {}
-        )
-
-        ShopifyAPI::Base.activate_session(session)
-        shipping_address = package.order.shipping_address
-
-        shopify_checkout = ShopifyAPI::Checkout.create(
-          email: package.order.user.try(:email),
-          line_items: shopify_line_items(package),
-          shipping_address: {
-            first_name: shipping_address.firstname,
-            last_name: shipping_address.lastname,
-            address1: shipping_address.address1,
-            address2: shipping_address.address2,
-            city: shipping_address.city,
-            province_code: shipping_address.state_abbr,
-            country_code: shipping_address.country_iso3,
-            phone: shipping_address.phone,
-            zip: shipping_address.zipcode
-          }
-        )
-
-        shopify_checkout.tax_lines.each do |tax_line|
-          tax_category = Spree::TaxCategory.find_or_create_by(name: tax_line.title)
-
-          tax_rate = Spree::TaxRate.find_or_initialize_by(
-            amount: tax_line.rate,
-            tax_category: tax_category
-          )
-
-          tax_rate.calculator = Spree::Calculator::DefaultTax.new
-          tax_rate.save!
-
-          Spree::Adjustment.create!(
-            source_type: "Spree::TaxRate", 
-            source_id: tax_rate.id,
-            adjustable: package.contents.first.line_item,
-            amount: tax_line.rate,
-            state: :open,
-            order: package.order,
-            included: false,
-            label: tax_line.title
-          )
-        end
-
-
-        rates = shopify_shipping_rates(shopify_checkout.shipping_rates, vendor_id, package)
-        ShopifyAPI::Base.clear_session
-        rates
-      end
-
-      def shopify_shipping_rates(rates, vendor_id, package)
-        rates.map do |rate|
-          shipping_method = Spree::ShippingMethod.find_or_create_by(admin_name: rate.title, name: rate.title) do |r|
-            r.display_on = 'both'
-            r.vendor_id = vendor_id
-            r.calculator = Spree::Calculator::Shipping::FlatRate.create
-            r.shipping_categories = [Spree::ShippingCategory.default]
-          end
-
-          Spree::ShippingRate.new(
-            cost: rate.price,
-            shipping_method: shipping_method
-          )
-        end
-      end
-
-      def shopify_line_items(package)
-        package.contents.map do |content|
-          {
-            variant_id: content.inventory_unit.line_item.variant.shopify_id,
-            quantity: content.inventory_unit.quantity
-          }
-        end
       end
     end
   end
