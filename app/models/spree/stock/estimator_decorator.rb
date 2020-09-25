@@ -14,7 +14,7 @@ module Spree
           vendor_id = package.stock_location.try(:vendor_id)
 
           if vendor_id.present?
-            #add price sacks to easypost rates
+						#add price sacks to easypost rates
             shipping_rates = calculate_price_sacks(vendor_id, package, shipping_method_filter)
           else
             shipping_rates = []
@@ -107,7 +107,7 @@ module Spree
           cost = shipping_method.calculator.compute(package)
 
           #don't display price sacks with easypost unless they are free
-          next if (cost.blank? || cost > 0)
+          next if shipping_method.is_price_sack? && (cost.blank? || cost > 0)
 
           shipping_method.shipping_rates.new(
             cost: gross_amount(cost, taxation_options_for(shipping_method)),

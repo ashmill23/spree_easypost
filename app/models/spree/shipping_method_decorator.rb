@@ -1,6 +1,10 @@
 Spree::ShippingMethod.class_eval do
   scope :price_sacks, -> { joins(:calculator).where('spree_calculators.type': "Spree::Calculator::Shipping::PriceSack") }
-  
+	
+	def is_price_sack?
+		calculator.type == 'Spree::Calculator::Shipping::PriceSack'
+	end
+		
   # Some shipping methods are only meant to be set via backend
   def frontend?
     self.display_on != "back_end" && !none?
