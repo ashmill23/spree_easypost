@@ -19,7 +19,7 @@ module Spree
           else
             shipping_rates = []
           end
-          logger.info(shipment)
+          puts shipment
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
@@ -45,7 +45,7 @@ module Spree
             end
             shipping_rates
 					else
-						logger.info('easypost rates empty')
+						puts 'easypost rates empty'
             shipping_rates
           end
         else
