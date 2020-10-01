@@ -5,9 +5,9 @@ module Spree
         # Only use easypost on the FrontEnd if the flag is set and the package
         # flag allows for it to be used. Otherwise use the default spree methods.
         # This allows for faster load times on the front end if we dont want to do dyanmic shipping
-        puts "use easypost?  #{use_easypost_to_calculate_rate?(package, shipping_method_filter)}"
 				logger = Rails.logger
-				
+				logger.info("use easypost?  #{use_easypost_to_calculate_rate?(package, shipping_method_filter)}")
+
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
