@@ -19,7 +19,7 @@ module Spree
           else
             shipping_rates = []
           end
-          
+          binding.pry
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
@@ -34,7 +34,7 @@ module Spree
                 easy_post_rate_id: rate.id,
                 shipping_method: shipping_method
               )
-
+							binding.pry
               # Save the rates that we want to show the customer
               shipping_rates << spree_rate if shipping_method.available_to_display(shipping_method_filter)
             end
