@@ -6,7 +6,8 @@ module Spree
         # flag allows for it to be used. Otherwise use the default spree methods.
         # This allows for faster load times on the front end if we dont want to do dyanmic shipping
         puts "use easypost?  #{use_easypost_to_calculate_rate?(package, shipping_method_filter)}"
-
+				logger = Rails.logger
+				
         if use_easypost_to_calculate_rate?(package, shipping_method_filter)
           shipment = package.easypost_shipment
           rates = shipment.rates.sort_by { |r| r.rate.to_i }
@@ -19,7 +20,7 @@ module Spree
           else
             shipping_rates = []
           end
-          puts shipment
+          logger.info(shipment)
           if rates.any?
             rates.each do |rate|
               # See if we can find the shipping method otherwise create it
@@ -45,7 +46,7 @@ module Spree
             end
             shipping_rates
 					else
-						puts 'easypost rates empty'
+						logger.info('easypost rates empty')
             shipping_rates
           end
         else
