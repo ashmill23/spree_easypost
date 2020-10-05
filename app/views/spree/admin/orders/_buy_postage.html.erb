@@ -5,6 +5,6 @@
             <div class='clearfix'></div>
         <% end %>
     <% elsif shipment.ready? %>
-        <%= link_to Spree.t(:buy_postage), 'javascript:;', class: 'ship-postage pull-right btn btn-primary', data: { 'shipment-number' => shipment.number }, style: 'margin-left: 15px;' %>
+        <!--<%= link_to Spree.t(:buy_postage), 'javascript:;', class: 'ship-postage pull-right btn btn-primary', data: { 'shipment-number' => shipment.number }, style: 'margin-left: 15px;' %>-->
     <% end %>
 <% end %>
